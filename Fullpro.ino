@@ -41,7 +41,7 @@ unsigned short readEEPROM()
 {
  byte dataHigh = EEPROM.read(0);
  byte dataLow = EEPROM.read(1);
-  return (dataHigh << 8 + dataLow;
+  return (dataHigh << 8) + dataLow;
 }
 void setup() 
 {
