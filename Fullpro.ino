@@ -1,4 +1,4 @@
-Chinawat Daochai #include <EEPROM.h>
+#include <EEPROM.h>
 #include <Arduino.h>
 #define windDir A0 /// ทิศาทงลม
 #define ANEMOMETER D7 // Interrupt pin ความเร็วลม
