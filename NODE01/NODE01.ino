@@ -4,11 +4,15 @@
 //////////////////
 #define relay 27
 #define waterlevel 13
+#define button_mode_1 12
+#define button_mode_2 14
 //////////////////
 int n_loop = 0;
 int time_delay[2] = {0,0};
-int read_time[2] = {5,2};
-int cooldown = 2;
+//int read_time[2] = {5,2};
+int time1 = 0;
+int time2 = 0;
+int cooldown = 0;
 int set_cooldown = 0;
 
 ///////////////////
@@ -31,8 +35,11 @@ void setup() {
   //Relay
   pinMode(relay, OUTPUT);
   digitalWrite(relay, HIGH);
-  //Waterlevel
+//  //Waterlevel
   pinMode(waterlevel, INPUT_PULLUP);
+  /////Button
+  pinMode(button_mode_1, INPUT_PULLUP);
+  pinMode(button_mode_2, INPUT_PULLUP);
   //SHOWMODE
   Pr_line();
   Serial.print("MODE : ");
@@ -49,27 +56,47 @@ time_delay[1] = (read_time[1] *1000);
 set_cooldown = cooldown * 1000;
 
 //setmode
-if(Serial.available()> 0){
-    mode_val = Serial.read();
-    if(mode_val == '1'){
-      mode_S = 1;
-      Serial.print("MODE : ");
-      Serial.println(mode_S);
-      Pr_line();
-    }
-    if(mode_val == '2'){
-      mode_S = 2;
-      Serial.print("MODE : ");
-      Serial.println(mode_S);
-      Pr_line();
-    }
-}
+//unsigned long buttonState;
+//unsigned long buttonState;
+if(digitalRead(button_mode_1) == LOW){
+  mode_S = 1;
+  Serial.print("MODE : ");
+  Serial.println(mode_S);
+  Pr_line();
+  }
+else if(digitalRead(button_mode_2) == LOW){
+  mode_S = 2;
+  Serial.print("MODE : ");
+  Serial.println(mode_S);
+  Pr_line();
+  }
+//if(Serial.available()> 0){
+//    mode_val = Serial.read();
+//    if(mode_val == '1'){
+//      mode_S = 1;
+//      Serial.print("MODE : ");
+//      Serial.println(mode_S);
+//      Pr_line();
+//    }
+//    if(mode_val == '2'){
+//      mode_S = 2;
+//      Serial.print("MODE : ");
+//      Serial.println(mode_S);
+//      Pr_line();
+//    }
+//}
  network.update();
   //===== Receiving =====//
   while ( network.available() ) {     // Is there any incoming data?
     RF24NetworkHeader header2;
-    unsigned long buttonState;
+    unsigned int buttonState;
     network.read(header2, &buttonState, sizeof(buttonState)); // Read the incoming data
+//    if(buttonState == LOW){
+//      digitalWrite(relay, buttonState);
+//    }
+//    else{
+//      digitalWrite(relay, buttonState);
+//    }
   if (mode_S == 1){
     if(buttonState == LOW){
       digitalWrite(relay, buttonState);
@@ -98,19 +125,16 @@ if(Serial.available()> 0){
 }
 
   //===== Sending =====//
-//  waterlevel
-//  unsigned long waterlevelV = digitalRead(waterlevel); // Read waterlevel sensor
-//  RF24NetworkHeader header8(master00);
-//  bool ok = network.write(header8, &waterlevelV, sizeof(waterlevelV)); // Send the data
-//
-//  Serial.print("WATERLEVEL : ");
-//  if(waterlevelV == HIGH){
-//    Serial.println("HIGH");
+//  //waterlevel
+//  unsigned int waterlevelV = digitalRead(waterlevel); // Read waterlevel sensor
+//  RF24NetworkHeader header(master00);
+//  if(waterlevelV == LOW){
+//  bool ok = network.write(header, &waterlevelV, sizeof(waterlevelV)); // Send the data
 //  }
-//  else{
-//    Serial.println("LOW ");
-//  }
-
+//      if(waterlevelV == LOW){
+//          Serial.print("WATERLEVEL : ");
+//          Serial.println("NOT WATER");
+//      }
   
 //  digitalWrite(Relay_1,HIGH);
 //  delay(2000);

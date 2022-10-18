@@ -1,11 +1,7 @@
-/*
-  Arduino Wireless Network - Multiple NRF24L01 Tutorial
-            == Node 012 (child of Node 02)==    
-*/
 /////ประกาศเรียกใช้
 #include <Stepper.h>
 #define STEPS 2048 // the number of steps in one revolution of your motor (28BYJ-48)
-Stepper stepper(STEPS, 13, 14, 12, 27); // เวลาเสียบกับบอร์ด เรียงตามปกติคือ 2 3 4 5
+Stepper stepper(STEPS, 13, 14, 12, 27); // เวลาเสียบกับบอร์ด เรียงตามปกติคือ 13 12 14 27
 #include <LiquidCrystal_I2C.h>
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 #include <RF24Network.h>
@@ -14,6 +10,7 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 /////PORT
 //#define relay 2
 //#define IR 3
+#define waterlevel 26
 /////ตัวแปร
 int last_level = 1;
 /////NRF24L01
@@ -35,6 +32,8 @@ void setup() {
   radio.setDataRate(RF24_2MBPS);
   //stepper.setSpeed(10); // เลือกความเร็ว
   //stepper.step(0);  //หมุนไปทิศทาง 90 องศา , ถ้า 1024 จะหมุนไปทิศทาง 180 องศา
+  //Waterlevel
+  pinMode(waterlevel, INPUT_PULLUP);
   //pinMode(relay, OUTPUT);
   //pinMode(IR, INPUT);
 }
@@ -49,9 +48,9 @@ void loop() {
   network.update();
   //===== รับค่า =====//
   while ( network.available() ) {     // Is there any incoming data?
-    RF24NetworkHeader header;
-    unsigned long buttonState_level = 1;
-    network.read(header, &buttonState_level, sizeof(buttonState_level)); // Read the incoming data
+    RF24NetworkHeader header4;
+    unsigned int buttonState_level = 1;
+    network.read(header4, &buttonState_level, sizeof(buttonState_level)); // Read the incoming data
     //digitalWrite(relay, !buttonState); // Turn on or off the RELAY
     lcd.setCursor(8, 0);
     lcd.print(buttonState_level);
@@ -111,6 +110,16 @@ void loop() {
       }
     }
 //  //===== Sending =====//
+  //waterlevel
+unsigned int waterlevelV = digitalRead(waterlevel); // Read waterlevel sensor
+RF24NetworkHeader header2(master00);
+if(waterlevelV == LOW){
+  bool ok = network.write(header2, &waterlevelV, sizeof(waterlevelV)); // Send the data
+  if(waterlevelV == LOW){
+          Serial.print("WATERLEVEL : ");
+          Serial.println("NOT WATER");
+      }
+}
 //  unsigned long irV = digitalRead(IR); // Read IR sensor
 //  RF24NetworkHeader header8(node01);
 //  bool ok = network.write(header8, &irV, sizeof(irV)); // Send the data
